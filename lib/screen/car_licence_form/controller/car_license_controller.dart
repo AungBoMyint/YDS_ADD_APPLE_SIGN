@@ -16,9 +16,10 @@ import '../../../model/radio/radio_model.dart';
 import '../../../service/api.dart';
 
 class CarLicenseController extends GetxController {
-  Map<String,TextEditingController> inputMap = <String,TextEditingController>{};
+  Map<String, TextEditingController> inputMap =
+      <String, TextEditingController>{};
   final HomeController _homeController = Get.find();
-  Map<String,dynamic> radioMap = <String,dynamic>{};
+  Map<String, dynamic> radioMap = <String, dynamic>{};
   final Database _database = Database();
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
@@ -33,24 +34,26 @@ class CarLicenseController extends GetxController {
   Rxn<DateTime?> selectedDateTime = Rxn<DateTime?>();
 
   @override
-  void onInit() async{
+  void onInit() async {
     super.onInit();
     final result = await _database.readCollection(carLicenceCostCollection);
-    if(result.docs.isNotEmpty){
+    if (result.docs.isNotEmpty) {
       costList.value = result.docs.map((e) => Cost.fromJson(e.data())).toList();
       costID.value = costList.first.id;
     }
   }
 
-  String? validate(String label,String fieldKey,String? value){
-    if(checkHasError(fieldKey,value)){
+  String? validate(String label, String fieldKey, String? value) {
+    if (checkHasError(fieldKey, value)) {
       return "*$labelကို ဖြည့်ရန်လိုအပ်သည်";
-    }else{
+    } else {
       return null;
     }
   }
+
   void setCostId(String id) => costID.value = id;
-  void setSelectedDateTime(DateTime dateTime) => selectedDateTime.value = dateTime;
+  void setSelectedDateTime(DateTime dateTime) =>
+      selectedDateTime.value = dateTime;
 
   /* void changeTimeType(TimeType value) => timeType.value = value;
   void changeDayType(DayType value) => dayType.value = value;
@@ -58,34 +61,33 @@ class CarLicenseController extends GetxController {
   void changeCarType(CarType value) => carType.value = value; */
   void pressedFirstTime() => isFirstTimePress.value = true;
 
-  bool isValidate(){
-    var hasErrorList = inputMap.entries.where((element) => element.value.text.isEmpty).toList();
-    if(hasErrorList.isNotEmpty ){
+  bool isValidate() {
+    var hasErrorList = inputMap.entries
+        .where((element) => element.value.text.isEmpty)
+        .toList();
+    if (hasErrorList.isNotEmpty) {
       return false;
-    }else{
+    } else {
       return true;
     }
   }
 
-  bool checkHasError(String fieldKey,String? value){
-
-    if(
-    (inputMap[fieldKey]!.value.text.isEmpty)
-        && isFirstTimePress.value){
+  bool checkHasError(String fieldKey, String? value) {
+    if ((inputMap[fieldKey]!.value.text.isEmpty) && isFirstTimePress.value) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
 
   Future<void> submitForm({
     required String enginPowerType,
-  }) async{
+  }) async {
     try {
       final uuID = Uuid().v1();
       final carModel = CarLicenceForm(
         id: uuID,
-        cost: costList.where((e) => e.id == costID).first.cost,
+        cost: costList.where((e) => e.id == costID.value).first.cost,
         userId: _homeController.currentUser.value?.id ?? "",
         name: inputMap["name"]?.text ?? "",
         address: inputMap["adress"]?.text ?? "",
@@ -104,33 +106,34 @@ class CarLicenseController extends GetxController {
             .ref()
             .child("bankSlip/${carModel.id}")
             .putFile(File(_homeController.bankSlipImage.value))
-            .then((snapshot) async{
-          await snapshot.ref.getDownloadURL()
-              .then((value) async{
-            await _database.write(
-              carLicenceCollection,
-              path: uuID,
-              data: carModel.copyWith(
-                bankSlipImage: value,
-              ).toJson(),
-            ).then((value) => Api.sendPushToAdmin(
-                "ကားလိုင်စင်",
-                "🧑အမည်:${inputMap["name"]?.text ?? ""}\n"
-                    "🏠လိပ်စာ: ${inputMap["adress"]?.text ?? ""}\n"
-                    "✍ဖုန်း: ${inputMap["phNo"]?.text ?? ""}"))
-                .then((value) async{
+            .then((snapshot) async {
+          await snapshot.ref.getDownloadURL().then((value) async {
+            await _database
+                .write(
+                  carLicenceCollection,
+                  path: uuID,
+                  data: carModel
+                      .copyWith(
+                        bankSlipImage: value,
+                      )
+                      .toJson(),
+                )
+                .then((value) => Api.sendPushToAdmin(
+                    "ကားလိုင်စင်",
+                    "🧑အမည်:${inputMap["name"]?.text ?? ""}\n"
+                        "🏠လိပ်စာ: ${inputMap["adress"]?.text ?? ""}\n"
+                        "✍ဖုန်း: ${inputMap["phNo"]?.text ?? ""}"))
+                .then((value) async {
               hideLoading();
-              Get.snackbar("Success", "",duration: const Duration(seconds: 1));
+              Get.snackbar("Success", "", duration: const Duration(seconds: 1));
               await Future.delayed(const Duration(seconds: 2));
               Navigator.pop(Get.context!);
               Get.defaultDialog(
                 title: "Success",
                 titleStyle: const TextStyle(color: Colors.black),
-
-
-                content:  Text(
+                content: Text(
                   "We will notify to you when admin confirm your form.",
-                  style:const  TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.black),
                 ),
                 onConfirm: () => Get.back(),
                 confirm: confirmButton(),
@@ -142,29 +145,29 @@ class CarLicenseController extends GetxController {
             });
           });
         });
-      }else{
-        await _database.write(
-          carLicenceCollection,
-          path: uuID,
-          data: carModel.toJson(),
-        ).then((value) => Api.sendPushToAdmin(
-            "ကားလိုင်စင်",
-            "🧑အမည်:${inputMap["name"]?.text ?? ""}\n"
-                "🏠လိပ်စာ: ${inputMap["adress"]?.text ?? ""}\n"
-                "✍ဖုန်း: ${inputMap["phNo"]?.text ?? ""}"))
-            .then((value) async{
+      } else {
+        await _database
+            .write(
+              carLicenceCollection,
+              path: uuID,
+              data: carModel.toJson(),
+            )
+            .then((value) => Api.sendPushToAdmin(
+                "ကားလိုင်စင်",
+                "🧑အမည်:${inputMap["name"]?.text ?? ""}\n"
+                    "🏠လိပ်စာ: ${inputMap["adress"]?.text ?? ""}\n"
+                    "✍ဖုန်း: ${inputMap["phNo"]?.text ?? ""}"))
+            .then((value) async {
           hideLoading();
-          Get.snackbar("Success", "",duration: const Duration(seconds: 1));
+          Get.snackbar("Success", "", duration: const Duration(seconds: 1));
           await Future.delayed(const Duration(seconds: 2));
           Navigator.pop(Get.context!);
           Get.defaultDialog(
             title: "Success",
             titleStyle: const TextStyle(color: Colors.black),
-
-
-            content:  Text(
+            content: Text(
               "We will notify to you when admin confirm your form.",
-              style:const  TextStyle(color: Colors.black),
+              style: const TextStyle(color: Colors.black),
             ),
             onConfirm: () => Get.back(),
             confirm: confirmButton(),
@@ -175,11 +178,9 @@ class CarLicenseController extends GetxController {
           );
         });
       }
-
     } catch (e) {
       Get.snackbar("Failed!", "Try again.");
       debugPrint("**********$e");
     }
-
   }
 }

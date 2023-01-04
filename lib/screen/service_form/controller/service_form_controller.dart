@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -15,7 +16,8 @@ import '../../../model/price/cost.dart';
 import '../../../service/api.dart';
 
 class ServiceFormController extends GetxController {
-  Map<String,TextEditingController> inputMap = <String,TextEditingController>{};
+  Map<String, TextEditingController> inputMap =
+      <String, TextEditingController>{};
   final Database _database = Database();
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
@@ -27,71 +29,75 @@ class ServiceFormController extends GetxController {
 
   Rxn<DateTime?> selectedDateTime = Rxn<DateTime?>();
 
-  String? validate(String label,String fieldKey,String? value){
-    if(checkHasError(fieldKey,value)){
+  String? validate(String label, String fieldKey, String? value) {
+    if (checkHasError(fieldKey, value)) {
       return "*$labelကို ဖြည့်ရန်လိုအပ်သည်";
-    }else{
+    } else {
       return null;
     }
   }
 
   @override
-  void onInit() async{
+  void onInit() async {
     super.onInit();
     final result = await _database.readCollection(drivingLicenceCostCollection);
-    if(result.docs.isNotEmpty){
+    if (result.docs.isNotEmpty) {
       costList.value = result.docs.map((e) => Cost.fromJson(e.data())).toList();
       costID.value = costList.first.id;
     }
-
   }
 
   void setCostId(String id) => costID.value = id;
-  void setSelectedDateTime(DateTime dateTime) => selectedDateTime.value = dateTime;
-
+  void setSelectedDateTime(DateTime dateTime) =>
+      selectedDateTime.value = dateTime;
 
   void pressedFirstTime() => isFirstTimePress.value = true;
 
-  bool isValidate(){
-
+  bool isValidate() {
     var mapNotOptional = {};
     for (var element in inputMap.entries) {
-      if((element.key == "licenseNo") || (element.key == "licenseExpireDate")){
+      if ((element.key == "licenseNo") ||
+          (element.key == "licenseExpireDate")) {
         debugPrint("**********${element.key}");
-      }else{
+      } else {
         debugPrint("**********${element.key}");
         mapNotOptional.putIfAbsent(element.key, () => element.value);
       }
     }
-    var hasErrorList = mapNotOptional.entries.where((element) => element.value.text.isEmpty).toList();
+    var hasErrorList = mapNotOptional.entries
+        .where((element) => element.value.text.isEmpty)
+        .toList();
     debugPrint("***********MapNotOptionalLength: ${mapNotOptional.length}");
-    if(hasErrorList.isNotEmpty){
+    if (hasErrorList.isNotEmpty) {
       return false;
-    }else{
+    } else {
       return true;
     }
   }
 
-  bool checkHasError(String fieldKey,String? value){
-
-    if(
-    (inputMap[fieldKey]!.value.text.isEmpty)
-        && isFirstTimePress.value){
+  bool checkHasError(String fieldKey, String? value) {
+    if ((inputMap[fieldKey]!.value.text.isEmpty) && isFirstTimePress.value) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
 
-  Future<void> submitForm({
+  submitForm({
     required String licenceType,
     required String serviceType,
-  }) async{
+  }) async {
     try {
       final uuID = Uuid().v1();
       final drivingModel = DrivingLicenceForm(
         id: uuID,
-        cost: costList.where((e) => e.id == costID).first.cost,
+        cost: costList
+            .where((e) {
+              log("cost id: ${e.id}");
+              return e.id == costID.value;
+            })
+            .first
+            .cost,
         userId: _homeController.currentUser.value?.id ?? "",
         name: inputMap["name"]?.text ?? "",
         fatherName: inputMap["father-name"]?.text ?? "",
@@ -106,7 +112,7 @@ class ServiceFormController extends GetxController {
         isConfirmed: false,
         dateTime: DateTime.now(),
       );
-      if(_homeController.bankSlipImage.isNotEmpty){
+      if (_homeController.bankSlipImage.isNotEmpty) {
         await _firebaseStorage
             .ref()
             .child("bankSlip/${drivingModel.id}")
@@ -114,28 +120,27 @@ class ServiceFormController extends GetxController {
             .then((snapshot) async {
           await snapshot.ref.getDownloadURL().then((value) async {
             showLoading();
-            await _database.write(
-                drivingLicenceCollection,
-                path: uuID,
-                data: drivingModel.copyWith(bankSlipImage: value).toJson()
-            ).then((value) => Api.sendPushToAdmin(
-                "လိုင်စင်",
-                "🧑အမည်:${inputMap["name"]?.text ?? ""}\n"
-                    "🏠လိပ်စာ: ${inputMap["adress"]?.text ?? ""}\n"
-                    "✍ဖုန်း: ${inputMap["phNo"]?.text ?? ""}"))
-                .then((value) async{
+            await Future.delayed(const Duration(seconds: 0));
+            _database
+                .write(drivingLicenceCollection,
+                    path: uuID,
+                    data: drivingModel.copyWith(bankSlipImage: value).toJson())
+                .then((value) => Api.sendPushToAdmin(
+                    "လိုင်စင်",
+                    "🧑အမည်:${inputMap["name"]?.text ?? ""}\n"
+                        "🏠လိပ်စာ: ${inputMap["adress"]?.text ?? ""}\n"
+                        "✍ဖုန်း: ${inputMap["phNo"]?.text ?? ""}"))
+                .then((value) async {
               hideLoading();
-              Get.snackbar("Success", "",duration: const Duration(seconds: 1));
+              Get.snackbar("Success", "", duration: const Duration(seconds: 1));
               await Future.delayed(const Duration(seconds: 2));
               Navigator.pop(Get.context!);
               Get.defaultDialog(
                 title: "Success",
                 titleStyle: const TextStyle(color: Colors.black),
-
-
-                content:  Text(
+                content: Text(
                   "We will notify to you when admin confirm your form.",
-                  style:const  TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.black),
                 ),
                 onConfirm: () => Get.back(),
                 confirm: confirmButton(),
@@ -145,32 +150,30 @@ class ServiceFormController extends GetxController {
                 radius: 10,
               );
             });
-
-          });});
-      }else{
+          });
+        });
+      } else {
         showLoading();
-        await _database.write(
-            drivingLicenceCollection,
-            path: uuID,
-            data: drivingModel.toJson()
-        ).then((value) => Api.sendPushToAdmin(
-            "လိုင်စင်",
-            "🧑အမည်:${inputMap["name"]?.text ?? ""}\n"
-                "🏠လိပ်စာ: ${inputMap["adress"]?.text ?? ""}\n"
-                "✍ဖုန်း: ${inputMap["phNo"]?.text ?? ""}"))
-            .then((value) async{
+        await Future.delayed(const Duration(seconds: 0));
+        _database
+            .write(drivingLicenceCollection,
+                path: uuID, data: drivingModel.toJson())
+            .then((value) => Api.sendPushToAdmin(
+                "လိုင်စင်",
+                "🧑အမည်:${inputMap["name"]?.text ?? ""}\n"
+                    "🏠လိပ်စာ: ${inputMap["adress"]?.text ?? ""}\n"
+                    "✍ဖုန်း: ${inputMap["phNo"]?.text ?? ""}"))
+            .then((value) async {
           hideLoading();
-          Get.snackbar("Success", "",duration: const Duration(seconds: 1));
+          Get.snackbar("Success", "", duration: const Duration(seconds: 1));
           await Future.delayed(const Duration(seconds: 2));
           Navigator.pop(Get.context!);
           Get.defaultDialog(
             title: "Success",
             titleStyle: const TextStyle(color: Colors.black),
-
-
-            content:  Text(
+            content: Text(
               "We will notify to you when admin confirm your form.",
-              style:const  TextStyle(color: Colors.black),
+              style: const TextStyle(color: Colors.black),
             ),
             onConfirm: () => Get.back(),
             confirm: confirmButton(),
@@ -180,7 +183,6 @@ class ServiceFormController extends GetxController {
             radius: 10,
           );
         });
-
       }
     } catch (e) {
       Get.snackbar("Failed!", "Try again.");

@@ -14,6 +14,7 @@ import 'package:hammies_user/screen/admin/sub_question_management/bin/sub_questi
 import 'package:hammies_user/screen/admin/sub_question_management/view/sub_question_management_view.dart';
 import 'package:hammies_user/screen/course_form/bin/course_form_binding.dart';
 import 'package:hammies_user/screen/course_form/view/course_form.dart';
+import 'package:hammies_user/screen/login_screen.dart';
 import 'package:hammies_user/screen/question5/bin/q_binding.dart';
 import 'package:hammies_user/screen/reward_product_see_all.dart';
 import 'package:hammies_user/screen/service_form/bin/service_form_binding.dart';
@@ -220,5 +221,9 @@ List<GetPage> routes = [
   GetPage(
     name: searchScreen,
     page: () => SearchScreen(),
+  ),
+  GetPage(
+    name: loginScreen,
+    page: () => LoginScreen(),
   ),
 ];

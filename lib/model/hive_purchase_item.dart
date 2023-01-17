@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 part 'hive_purchase_item.g.dart';
 
-@HiveType(typeId: 6)
+@HiveType(typeId: 7)
 class HivePurchaseItem {
   @HiveField(0)
   String itemName;

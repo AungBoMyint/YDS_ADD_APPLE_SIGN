@@ -56,9 +56,9 @@ class PurchaseScreen extends StatelessWidget {
     return ListView.builder(
       itemCount: controller.purchcasesCashOn().length,
       itemBuilder: (_, i) {
-        List town = controller.purchcasesCashOn()[i].deliveryTownshipInfo;
-        final shipping = town[1];
-        final townName = town[0];
+        List? town = controller.purchcasesCashOn()[i].deliveryTownshipInfo;
+        final shipping = town?[1] ?? 0;
+        final townName = town?[0] ?? "";
         return ListTile(
           title: Text(
               "${controller.purchcasesCashOn()[i].name} 0${controller.purchcasesCashOn()[i].phone}"),
@@ -97,9 +97,9 @@ class PurchaseScreen extends StatelessWidget {
     return ListView.builder(
       itemCount: controller.purchcasesPrePay().length,
       itemBuilder: (_, i) {
-        List town = controller.purchcasesPrePay()[i].deliveryTownshipInfo;
-        final shipping = town[1];
-        final townName = town[0];
+        List? town = controller.purchcasesPrePay()[i].deliveryTownshipInfo;
+        final shipping = town?[1] ?? 0;
+        final townName = town?[0] ?? "";
         return AspectRatio(
           aspectRatio: 16 / 4,
           child: Card(

@@ -120,11 +120,12 @@ class HomeController extends GetxController {
     if (myRewardCart.isEmpty) {
       Get.snackbar('Error', "Cart is empty");
       return false;
-    } else if (townShipNameAndFee.isEmpty) {
+    } /* else if (townShipNameAndFee.isEmpty) {
       Get.snackbar('Error', "Need to choose a township");
       firstTimePressedCart.value = true;
       return false;
-    } else {
+    }  */
+    else {
       return true;
     }
   }
@@ -561,7 +562,7 @@ class HomeController extends GetxController {
   Future<void> proceedToPay() async {
     showLoading();
     try {
-      final total = subTotal + townShipNameAndFee["fee"] as int;
+      final total = subTotal + (townShipNameAndFee["fee"] ?? 0) as int;
       final _purchase = PurchaseModel(
         id: Uuid().v1(),
         userId: currentUser.value!.id,
@@ -578,8 +579,8 @@ class HomeController extends GetxController {
         address: "",
         bankSlipImage: null,
         deliveryTownshipInfo: [
-          townShipNameAndFee["townName"],
-          townShipNameAndFee["fee"]
+          townShipNameAndFee["townName"] ?? "",
+          townShipNameAndFee["fee"] ?? 0
         ],
       );
       final hivePurchase = HivePurchase(

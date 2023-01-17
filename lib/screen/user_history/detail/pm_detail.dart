@@ -7,15 +7,16 @@ import '../../../utils/widget/widget.dart';
 
 class PurchaseModelDetail extends StatelessWidget {
   final PurchaseModel purchaseModel;
-  const PurchaseModelDetail({Key? key,required this.purchaseModel}) : super(key: key);
+  const PurchaseModelDetail({Key? key, required this.purchaseModel})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: appBar(title: "History Detail"),
-       body: ListView(
+      appBar: appBar(title: "History Detail"),
+      body: ListView(
         children: [
-           FormRowWidget(
+          FormRowWidget(
             label: "နာမည်: ",
             value: purchaseModel.name,
           ),
@@ -28,16 +29,19 @@ class PurchaseModelDetail extends StatelessWidget {
             value: purchaseModel.address,
           ),
           FormRowWidget(
-            label: "${purchaseModel.deliveryTownshipInfo[0]}: ",
+            label: "${purchaseModel.deliveryTownshipInfo?[0] ?? ""}: ",
             value: "",
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 20,right: 20),
-            child: Text("Products များ", style: TextStyle(
+            padding: const EdgeInsets.only(left: 20, right: 20),
+            child: Text(
+              "Products များ",
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
                 color: Colors.black,
-              ),),
+              ),
+            ),
           ),
           SizedBox(
             height: purchaseModel.rewardProductList!.length * 50,
@@ -46,7 +50,7 @@ class PurchaseModelDetail extends StatelessWidget {
               primary: false,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: purchaseModel.rewardProductList!.length,
-              itemBuilder: (context,index){
+              itemBuilder: (context, index) {
                 final item = purchaseModel.rewardProductList![index];
                 return SizedBox(
                   height: 50,
@@ -54,7 +58,9 @@ class PurchaseModelDetail extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       //Name
-                      Text(item.name,),
+                      Text(
+                        item.name,
+                      ),
                       //Point
                       Text("${item.requirePoint} points"),
                       //Count
@@ -63,10 +69,10 @@ class PurchaseModelDetail extends StatelessWidget {
                   ),
                 );
               },
-              ),
+            ),
           ),
         ],
-       ),
+      ),
     );
   }
 }

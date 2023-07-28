@@ -30,6 +30,7 @@ Future<void> main() async {
   await Hive.openBox<HiveItem>(boxName);
   await Hive.openBox<HivePurchase>(purchaseBox);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await FirebaseMessaging.instance.subscribeToTopic("alarm");
   Get.put(HomeController());
   runApp(MyApp());
 }

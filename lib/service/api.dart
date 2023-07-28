@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:dio/dio.dart';
@@ -34,64 +36,91 @@ class Api {
 
   //Send Notificaiton After order uploaded
   static Future<void> sendPushToAdmin(String title, String message) async {
-    FirebaseFirestore.instance.collection(normalUserCollection)
-    .withConverter<AuthUser>(
-      fromFirestore: (data,__) => AuthUser.fromJson(data.data()!), 
-      toFirestore: (user,__) => user.toJson(),
-      )
-    .where("status", isGreaterThan: 0)
-    .get()
-    .then((value) async{
+    FirebaseFirestore.instance
+        .collection(normalUserCollection)
+        .withConverter<AuthUser>(
+          fromFirestore: (data, __) => AuthUser.fromJson(data.data()!),
+          toFirestore: (user, __) => user.toJson(),
+        )
+        .where("status", isGreaterThan: 0)
+        .get()
+        .then((value) async {
       final adminUser = value.docs.first.data();
-    final jsonBody = <String, dynamic>{
-      "notification": <String, dynamic>{
-        "title": title,
-        "body": message,
-      },
-      "data": <String, dynamic>{
-        "click_action": "FLUTTER_NOTIFICATION_CLICK",
-        "route": purchaseScreen,
-      },
-      "to": adminUser.token,
-    };
-    await Dio().post("https://fcm.googleapis.com/fcm/send",
-        data: jsonBody,
-        options: Options(headers: {
-          "Authorization": "key=$fcmKey",
-          "Content-Type": "application/json"
-        }));
+      final jsonBody = <String, dynamic>{
+        "notification": <String, dynamic>{
+          "title": title,
+          "body": message,
+        },
+        "data": <String, dynamic>{
+          "click_action": "FLUTTER_NOTIFICATION_CLICK",
+          "route": purchaseScreen,
+        },
+        "to": adminUser.token,
+      };
+      await Dio().post("https://fcm.googleapis.com/fcm/send",
+          data: jsonBody,
+          options: Options(headers: {
+            "Authorization": "key=$fcmKey",
+            "Content-Type": "application/json"
+          }));
     });
-    
   }
 
-  static Future<void> sendPushToUser(String title, String message,String userId) async {
-    FirebaseFirestore.instance.collection(normalUserCollection)
-    .withConverter<AuthUser>(
-      fromFirestore: (data,__) => AuthUser.fromJson(data.data()!), 
-      toFirestore: (user,__) => user.toJson(),
-      )
-    .doc(userId)
-    .get()
-    .then((value) async{
+  static Future<void> sendPushToUser(
+      String title, String message, String userId) async {
+    FirebaseFirestore.instance
+        .collection(normalUserCollection)
+        .withConverter<AuthUser>(
+          fromFirestore: (data, __) => AuthUser.fromJson(data.data()!),
+          toFirestore: (user, __) => user.toJson(),
+        )
+        .doc(userId)
+        .get()
+        .then((value) async {
       final user = value.data()!;
+      final jsonBody = <String, dynamic>{
+        "notification": <String, dynamic>{
+          "title": title,
+          "body": message,
+        },
+        "data": <String, dynamic>{
+          "click_action": "FLUTTER_NOTIFICATION_CLICK",
+          "route": homeScreen,
+        },
+        "to": user.token,
+      };
+      await Dio().post("https://fcm.googleapis.com/fcm/send",
+          data: jsonBody,
+          options: Options(headers: {
+            "Authorization": "key=$fcmKey",
+            "Content-Type": "application/json"
+          }));
+    });
+  }
+
+  static Future<void> sendPushToAllUser() async {
     final jsonBody = <String, dynamic>{
       "notification": <String, dynamic>{
-        "title": title,
-        "body": message,
+        "title": "Testing Push From Android",
+        "body": "test body",
       },
       "data": <String, dynamic>{
         "click_action": "FLUTTER_NOTIFICATION_CLICK",
-        "route": homeScreen,
+        "route": "/home",
       },
-      "to": user.token,
+      "condition": "'alarm' in topics",
     };
-    await Dio().post("https://fcm.googleapis.com/fcm/send",
-        data: jsonBody,
-        options: Options(headers: {
-          "Authorization": "key=$fcmKey",
-          "Content-Type": "application/json"
-        }));
-    });
-    
+    try {
+      final response = await Dio().post("https://fcm.googleapis.com/fcm/send",
+          data: jsonBody,
+          options: Options(headers: {
+            "Authorization": "key=$fcmKey",
+            "Content-Type": "application/json"
+          }));
+      print("Response ${response.statusCode}");
+    } catch (e) {
+      log("Status Code: $e");
+    }
+    ;
   }
 }

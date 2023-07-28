@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:hammies_user/routes/routes.dart';
+import 'package:hammies_user/service/api.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../controller/home_controller.dart';
@@ -479,6 +480,37 @@ class _AdminPanel extends StatelessWidget {
                         maxRadius: 20,
                         child: Text(
                           "${controller.enrollList.length + controller.carLicenceFormList.length + controller.drivingLicenceFormList.length + controller.purchaseModelList.length}",
+                          style: TextStyle(color: Colors.black, fontSize: 14),
+                        )),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: () {
+            Api.sendPushToAllUser();
+          },
+          child: Container(
+            height: 60,
+            margin: EdgeInsets.only(
+              left: 20,
+              right: 20,
+            ),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20, right: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Send Push  🎁"),
+                    CircleAvatar(
+                        backgroundColor: Colors.orange,
+                        minRadius: 20,
+                        maxRadius: 20,
+                        child: Text(
+                          "",
                           style: TextStyle(color: Colors.black, fontSize: 14),
                         )),
                   ],

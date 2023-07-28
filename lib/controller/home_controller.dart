@@ -830,26 +830,6 @@ class HomeController extends GetxController {
       brandItems.value =
           event.docs.map((e) => ItemModel.fromJson(e.data(), e.id)).toList();
     });
-
-    /// SIGN IN ANONYMOUSLY BECAUSE TO UPLOAD IMAGE FILE INTO FIREBASE'S STORAGE
-    ///
-    /// ...
-    // Future<void> signInAnonymous() async {
-    //   try {
-    //     await FirebaseAuth.instance.signInAnonymously();
-    //     debugPrint("***Signed in with temporary account.");
-    //   } on FirebaseAuthException catch (e) {
-    //     switch (e.code) {
-    //       case "operation-not-allowed":
-    //         debugPrint(
-    //             "****Anonymous auth hasn't been enabled for this project.");
-    //         break;
-    //       default:
-    //         debugPrint("***Unkown error.");
-    //     }
-    //   }
-    // }
-
     _auth.onAuthChange().listen((user) async {
       if (!(user == null)) {
         debugPrint("*******user is not null****");

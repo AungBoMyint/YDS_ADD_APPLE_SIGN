@@ -49,7 +49,7 @@ dependencies:
   dio: ^4.0.1
   flutter_swipe_action_cell: ^2.1.2
   flutter_launcher_icons: ^0.9.2
-  flutter_local_notifications: ^9.5.3+1
+  flutter_local_notifications: ^14.1.1
   analyzer: ^3.3.1
   sign_in_with_apple: ^4.3.0
   flutter_staggered_grid_view: 0.4.0
@@ -73,7 +73,7 @@ dependencies:
   shimmer: ^2.0.0
   google_sign_in:
   colours: ^0.0.2
-  flutter_svg: ^0.21.0+1
+  #flutter_svg: ^0.21.0+1
   datetime_picker_formfield:
   dropdownfield: ^1.0.3
   syncfusion_flutter_datepicker: ^20.2.39

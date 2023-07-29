@@ -45,24 +45,27 @@ class Api {
         .where("status", isGreaterThan: 0)
         .get()
         .then((value) async {
-      final adminUser = value.docs.first.data();
-      final jsonBody = <String, dynamic>{
-        "notification": <String, dynamic>{
-          "title": title,
-          "body": message,
-        },
-        "data": <String, dynamic>{
-          "click_action": "FLUTTER_NOTIFICATION_CLICK",
-          "route": purchaseScreen,
-        },
-        "to": adminUser.token,
-      };
-      await Dio().post("https://fcm.googleapis.com/fcm/send",
-          data: jsonBody,
-          options: Options(headers: {
-            "Authorization": "key=$fcmKey",
-            "Content-Type": "application/json"
-          }));
+      final documents = value.docs;
+      for (var element in documents) {
+        final adminUser = element.data();
+        final jsonBody = <String, dynamic>{
+          "notification": <String, dynamic>{
+            "title": title,
+            "body": message,
+          },
+          "data": <String, dynamic>{
+            "click_action": "FLUTTER_NOTIFICATION_CLICK",
+            "route": purchaseScreen,
+          },
+          "to": adminUser.token,
+        };
+        await Dio().post("https://fcm.googleapis.com/fcm/send",
+            data: jsonBody,
+            options: Options(headers: {
+              "Authorization": "key=$fcmKey",
+              "Content-Type": "application/json"
+            }));
+      }
     });
   }
 
@@ -96,31 +99,5 @@ class Api {
             "Content-Type": "application/json"
           }));
     });
-  }
-
-  static Future<void> sendPushToAllUser() async {
-    final jsonBody = <String, dynamic>{
-      "notification": <String, dynamic>{
-        "title": "Testing Push From Android",
-        "body": "test body",
-      },
-      "data": <String, dynamic>{
-        "click_action": "FLUTTER_NOTIFICATION_CLICK",
-        "route": "/home",
-      },
-      "condition": "'alarm' in topics",
-    };
-    try {
-      final response = await Dio().post("https://fcm.googleapis.com/fcm/send",
-          data: jsonBody,
-          options: Options(headers: {
-            "Authorization": "key=$fcmKey",
-            "Content-Type": "application/json"
-          }));
-      print("Response ${response.statusCode}");
-    } catch (e) {
-      log("Status Code: $e");
-    }
-    ;
   }
 }

@@ -488,37 +488,6 @@ class _AdminPanel extends StatelessWidget {
             ),
           ),
         ),
-        GestureDetector(
-          onTap: () {
-            Api.sendPushToAllUser();
-          },
-          child: Container(
-            height: 60,
-            margin: EdgeInsets.only(
-              left: 20,
-              right: 20,
-            ),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20, right: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Send Push  🎁"),
-                    CircleAvatar(
-                        backgroundColor: Colors.orange,
-                        minRadius: 20,
-                        maxRadius: 20,
-                        child: Text(
-                          "",
-                          style: TextStyle(color: Colors.black, fontSize: 14),
-                        )),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }

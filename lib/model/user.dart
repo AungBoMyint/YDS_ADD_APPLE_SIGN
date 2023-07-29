@@ -11,6 +11,7 @@ class AuthUser {
   final int points;
   final int? status;
   final String token;
+  List<String>? nameList;
   AuthUser({
     required this.id,
     required this.emailAddress,
@@ -19,6 +20,7 @@ class AuthUser {
     required this.points,
     this.status = 0,
     required this.token,
+    this.nameList,
   });
 
   factory AuthUser.fromJson(Map<String, dynamic> json) =>

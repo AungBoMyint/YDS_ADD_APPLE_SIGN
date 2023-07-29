@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:hammies_user/main.dart';
 import 'package:hammies_user/screen/view/profile.dart';
 import 'package:hammies_user/utils/widget/widget.dart';
 import 'package:hammies_user/widgets/confirm_button.dart';
@@ -19,7 +20,6 @@ import 'view/hot.dart';
 import 'view/order_history.dart';
 
 List<Widget> _template = [
-
   HomeView(),
   // BrandView(),
   HotView(),
@@ -43,90 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    notitficationPermission();
-    initMessaging();
-  }
-
-  void notitficationPermission() async {
-    await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-  }
-
-  void initMessaging() async {
-    var androiInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    var iosInit = IOSInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
-
-    var initSetting = InitializationSettings(android: androiInit, iOS: iosInit);
-
-    fltNotification = FlutterLocalNotificationsPlugin();
-
-    selectNotification(String? payload) async {
-    if (payload != null) {
-      debugPrint('notification payload: $payload');
-    }
-    if(payload == homeScreen){
-      await Get.toNamed(homeScreen);
-    }
-    else{
-      await Get.toNamed(enrollmentScreen);
-    }
-    }
-
-    fltNotification!.initialize(initSetting,onSelectNotification: selectNotification);
-
-    if (messaging != null) {
-      print('vvvvvvv');
-    }
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if(message.data["route"] == homeScreen){//If user increase point
-        Get.defaultDialog(
-    title: "Congratulations 😚",
-    titleStyle: const TextStyle(color: Colors.black),
-    content:  Text(
-      "Your form is confirmed by admin\n"
-      "${message.notification!.body}",
-      style:const  TextStyle(color: Colors.black),
-      ),
-    onConfirm: () => Get.back(),
-    confirm: confirmButton(),
-                    confirmTextColor: Colors.white,
-                    barrierDismissible: false,
-                    buttonColor: Colors.transparent,
-                    radius: 10,
-                  );
-      }
-      showNotification(message);
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((event) {});
-  }
-
-  void showNotification(RemoteMessage message) async {
-    var androidDetails = AndroidNotificationDetails(
-      '1',
-      message.notification!.title ?? '',
-      icon: '@mipmap/ic_launcher',
-      color: Color(0xFF0f90f3),
-    );
-    var iosDetails = IOSNotificationDetails();
-    var generalNotificationDetails =
-        NotificationDetails(android: androidDetails, iOS: iosDetails);
-    await fltNotification!.show(0, message.notification!.title ?? '',
-        message.notification!.body ?? '', generalNotificationDetails,
-        payload:  message.data["route"]);
+    firebaseMessagingService.requestPermission();
+    firebaseMessagingService.setUpFullNotification();
   }
 
   @override
@@ -138,8 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: appBarColor,
         elevation: 0,
-       titleSpacing: 5,
-        
+        titleSpacing: 5,
+
         title: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -152,17 +70,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Expanded(
-              child: Text("  YANGON DRIVING SCHOOL",
-            
-                  style: TextStyle(
+              child: Text(
+                "  YANGON DRIVING SCHOOL",
+                style: TextStyle(
                     overflow: TextOverflow.visible,
                     color: Colors.black,
-                      fontSize: 15,
-                      wordSpacing: 2,
-                      letterSpacing: 2),
-                ),
+                    fontSize: 15,
+                    wordSpacing: 2,
+                    letterSpacing: 2),
+              ),
             ),
-            
           ],
         ),
         // centerTitle: true,
@@ -195,7 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           //User Profile
-
         ],
       ),
       body: Obx(

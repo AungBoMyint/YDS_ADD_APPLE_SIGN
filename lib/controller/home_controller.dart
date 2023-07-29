@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -31,6 +33,7 @@ import '../model/user.dart';
 import '../service/api.dart';
 import '../service/auth.dart';
 import '../service/database.dart';
+import '../utils/utils.dart';
 import '../widgets/show_loading/show_loading.dart';
 
 class HomeController extends GetxController {
@@ -839,6 +842,9 @@ class HomeController extends GetxController {
             .doc(user.uid)
             .get();
         if (!snapshot.exists) {
+          var nameList = getNameList(user.displayName!.removeAllWhitespace
+              .toLowerCase()
+              .removeAllWhitespace);
           //If not define before
           debugPrint("******Document is not exist so,we write to firebase");
           currentUser.value = AuthUser(
@@ -849,6 +855,7 @@ class HomeController extends GetxController {
             points: 0,
             token: currentUserDeviceToken.value,
             status: 0,
+            nameList: nameList,
           );
           await _database.write(
             normalUserCollection,

@@ -2,8 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:hammies_user/model/hive_reward_product.dart';
+import 'package:hammies_user/service/firebase_messaging_service.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'controller/home_controller.dart';
@@ -17,6 +19,10 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('Handling a background message ${message.messageId}');
 }
+
+FirebaseMessagingService firebaseMessagingService = FirebaseMessagingService();
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

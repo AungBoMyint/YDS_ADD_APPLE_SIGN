@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 import 'package:hammies_user/screen/view/cart.dart';
 import 'package:intl/intl.dart';
 
-Map<String,dynamic> inputMap = {};
+Map<String, dynamic> inputMap = {};
 
-String getDate(DateTime date){
+String getDate(DateTime date) {
   return DateFormat.yMMMMEEEEd().format(date);
 }
 
@@ -17,3 +17,12 @@ String getDate(DateTime date){
     elevation: 2,
   );
 } */
+
+List<String> getNameList(String name) {
+  List<String> subName = [];
+  var subList = name.split('');
+  for (var i = 0; i < subList.length; i++) {
+    subName.add(name.substring(0, i + 1).toLowerCase());
+  }
+  return subName;
+}
